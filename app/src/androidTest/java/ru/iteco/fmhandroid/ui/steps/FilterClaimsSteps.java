@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -22,6 +22,7 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.ViewInteraction;
 
 import ru.iteco.fmhandroid.R;
+import ru.iteco.fmhandroid.ui.data.LoadingIdlingResource;
 
 public class FilterClaimsSteps {
 

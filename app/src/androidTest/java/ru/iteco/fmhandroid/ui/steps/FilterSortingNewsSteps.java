@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -44,6 +44,7 @@ import org.junit.Assert;
 import io.qameta.allure.kotlin.Allure;
 import ru.iteco.fmhandroid.R;
 import ru.iteco.fmhandroid.ui.AppActivity;
+import ru.iteco.fmhandroid.ui.data.EspressoHelper;
 
 public
 
@@ -87,27 +88,46 @@ class FilterSortingNewsSteps {
         materialButton.perform(click());
     }
 
-    public String getFirstNewsTitle(int position) {
-        return EspressoHelper.getText(onView(withIndex(withId(R.id.news_item_title_text_view), position)));
+    public String getFirstNewsPublicationDate(int position) {
+        return EspressoHelper.getText(onView(withIndex(withId(R.id.news_item_publication_date_text_view), position)));
+    }
+
+    public String getFirstNewsDate(int position) {
+        return EspressoHelper.getText(onView(withIndex(withId(R.id.news_item_date_text_view), position)));
+    }
+
+    public void dateSortingOneClick() {
+        String date = getFirstNewsDate(0);
+        clickDateSortingNews();
+        elementWaiting(withId(R.id.news_list_recycler_view), 8000);
+        String dateAfterSorting = getFirstNewsDate(8);
+        Assert.assertEquals(date, dateAfterSorting);
+    }
+
+    public void dateSortingDoubleClick() {
+        clickDateSortingNews();
+        clickDateSortingNews();
+        elementWaiting(withId(R.id.news_list_recycler_view), 8000);
+        String dateAfterDoubleSorting = getFirstNewsDate(0);
+        Assert.assertEquals(dateAfterDoubleSorting, "01.01.001");
     }
 
 
-    public void dateSortingFromPast() {
-        String title = getFirstNewsTitle(0);
+    public void dateSortingOneClickControlPanel() {
+        String date = getFirstNewsPublicationDate(0);
         clickDateSortingNews();
         elementWaiting(withId(R.id.news_list_recycler_view), 8000);
-        String titleAfterSorting = getFirstNewsTitle(0);
-        Assert.assertNotEquals(title, titleAfterSorting);
+        String dateAfterSorting = getFirstNewsPublicationDate(3);
+        Assert.assertEquals(date, dateAfterSorting);
     }
 
-    public void dateSortingFromNuw() {
-        String title = getFirstNewsTitle(0);
-        clickDateSortingNews();
+    public void dateSortingDoubleClickControlPanel() {
         clickDateSortingNews();
         elementWaiting(withId(R.id.news_list_recycler_view), 8000);
-        onView(withId(R.id.news_list_recycler_view)).perform(swipeDown());
-        String titleAfterDoubleSorting = getFirstNewsTitle(0);
-        Assert.assertEquals(title, titleAfterDoubleSorting);
+        clickDateSortingNews();
+        elementWaiting(withId(R.id.news_list_recycler_view), 8000);
+        String dateAfterDoubleSorting = getFirstNewsPublicationDate(0);
+        Assert.assertEquals(dateAfterDoubleSorting, "01.01.001");
     }
 
     public void filterDateFromFuture() {
@@ -124,21 +144,6 @@ class FilterSortingNewsSteps {
 
     }
 
-    public void filterCategory() {
-        ViewInteraction materialButton = onView(allOf(withId(R.id.filter_news_material_button)));
-        materialButton.check(matches(isDisplayed()));
-        materialButton.perform(click());
-        ViewInteraction checkableImageButton = onView(allOf(withId(R.id.text_input_end_icon),
-                withContentDescription("Show dropdown menu")));
-        checkableImageButton.perform(click());
-        ViewInteraction textInputEditText = onView(withId(R.id.news_item_category_text_auto_complete_text_view));
-        textInputEditText.perform(click());
-        textInputEditText.perform(replaceText("Массаж"));
-        ViewInteraction materialButton2 = onView(allOf(withId(R.id.filter_button), withText("Filter")));
-        materialButton2.perform(click());
-        elementWaiting(withId(R.id.news_list_recycler_view), 8000);
-        onView(withId(R.id.news_list_recycler_view)).check(matches(withId(R.raw.icon_massage)));
-    }
 
 
     public void filterDate() {

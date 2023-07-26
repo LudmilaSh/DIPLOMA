@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -36,36 +36,43 @@ import ru.iteco.fmhandroid.R;
 public class CreateClaimsSteps {
 
     public void clickCreateClaim() {
-        elementWaiting(withId(R.id.add_new_claim_material_button), 8000);
+        elementWaiting(withId(R.id.add_new_claim_material_button), 10000);
         ViewInteraction materialButton = onView(allOf(withId(R.id.add_new_claim_material_button)));
         materialButton.check(matches(isDisplayed()));
         materialButton.perform(click());
     }
 
     public void inputTitle(String title) {
+        elementWaiting(withId(R.id.title_edit_text), 10000);
         ViewInteraction textInputEditText = onView(withId(R.id.title_edit_text));
+        textInputEditText.check(matches(isDisplayed()));
         textInputEditText.perform(click());
         textInputEditText.perform(replaceText(title));
     }
     public void inputDate(String date) {
         ViewInteraction textInputEditText = onView(allOf(withId(R.id.date_in_plan_text_input_edit_text)));
+        textInputEditText.check(matches(isDisplayed()));
         textInputEditText.perform(replaceText(date));
     }
     public void inputTime(String time) {
         ViewInteraction textInputEditText = onView(allOf(withId(R.id.time_in_plan_text_input_edit_text)));
+        textInputEditText.check(matches(isDisplayed()));
         textInputEditText.perform(replaceText(time));
     }
     public void inputDescription(String description) {
         ViewInteraction textInputEditText = onView(allOf(withId(R.id.description_edit_text)));
+        textInputEditText.check(matches(isDisplayed()));
         textInputEditText.perform(replaceText(description));
     }
     public void clickSaveButton() {
         ViewInteraction materialButton = onView(allOf(withId(R.id.save_button)));
+        materialButton.check(matches(isDisplayed()));
         materialButton.perform(scrollTo(), click());
     }
 
     public void clickCancelButton() {
         ViewInteraction materialButton = onView(allOf(withId(R.id.cancel_button)));
+        materialButton.check(matches(isDisplayed()));
         materialButton.perform(scrollTo(), click());
     }
 

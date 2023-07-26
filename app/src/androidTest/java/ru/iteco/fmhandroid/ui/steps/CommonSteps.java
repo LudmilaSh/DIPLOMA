@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -25,7 +25,7 @@ import ru.iteco.fmhandroid.R;
 public class CommonSteps {
 
     public void userLoggedIn() {
-        elementWaiting(withId(R.id.main_menu_image_button), 8000);
+        elementWaiting(withId(R.id.main_menu_image_button), 10000);
         ViewInteraction appCompatImageButton = onView(allOf(withId(R.id.main_menu_image_button),
                 withContentDescription("Main menu")));
         appCompatImageButton.check(matches(isDisplayed()));

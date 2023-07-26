@@ -1,24 +1,22 @@
 package ru.iteco.fmhandroid.ui.tests;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.qameta.allure.kotlin.Allure;
+import io.qameta.allure.android.runners.AllureAndroidJUnit4;
 import io.qameta.allure.kotlin.Description;
-import io.qameta.allure.kotlin.Step;
 import io.qameta.allure.kotlin.junit4.DisplayName;
 import ru.iteco.fmhandroid.ui.AppActivity;
-import ru.iteco.fmhandroid.ui.data.AboutSteps;
-import ru.iteco.fmhandroid.ui.data.AuthorizationAndLogoutSteps;
-import ru.iteco.fmhandroid.ui.data.CommonSteps;
+import ru.iteco.fmhandroid.ui.steps.AboutSteps;
+import ru.iteco.fmhandroid.ui.steps.AuthorizationAndLogoutSteps;
+import ru.iteco.fmhandroid.ui.steps.CommonSteps;
+import ru.iteco.fmhandroid.ui.data.ScreenshotOnFailureRule;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(AllureAndroidJUnit4.class)
 public class About {
     AboutSteps aboutSteps = new AboutSteps();
     CommonSteps commonSteps = new CommonSteps();
@@ -27,6 +25,10 @@ public class About {
     @Rule
     public ActivityTestRule<AppActivity> activityTestRule =
             new ActivityTestRule<>(AppActivity.class);
+
+    @Rule
+    public ScreenshotOnFailureRule screenshotRule = new ScreenshotOnFailureRule();
+
 
     @Before
     public void setUp() {

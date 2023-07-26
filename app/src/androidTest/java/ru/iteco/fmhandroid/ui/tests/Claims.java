@@ -1,21 +1,24 @@
 package ru.iteco.fmhandroid.ui.tests;
 
+import android.os.SystemClock;
+
 import androidx.test.rule.ActivityTestRule;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import io.qameta.allure.android.runners.AllureAndroidJUnit4;
 import io.qameta.allure.kotlin.Description;
 import io.qameta.allure.kotlin.junit4.DisplayName;
 import ru.iteco.fmhandroid.ui.AppActivity;
-import ru.iteco.fmhandroid.ui.data.AuthorizationAndLogoutSteps;
-import ru.iteco.fmhandroid.ui.data.CommonSteps;
-import ru.iteco.fmhandroid.ui.data.CreateClaimsSteps;
-import ru.iteco.fmhandroid.ui.data.EditClaimsSteps;
-import ru.iteco.fmhandroid.ui.data.FilterClaimsSteps;
-
+import ru.iteco.fmhandroid.ui.steps.AuthorizationAndLogoutSteps;
+import ru.iteco.fmhandroid.ui.steps.CommonSteps;
+import ru.iteco.fmhandroid.ui.steps.CreateClaimsSteps;
+import ru.iteco.fmhandroid.ui.steps.EditClaimsSteps;
+import ru.iteco.fmhandroid.ui.steps.FilterClaimsSteps;
+@RunWith(AllureAndroidJUnit4.class)
 public class Claims {
     AuthorizationAndLogoutSteps authorizationAndLogoutSteps = new AuthorizationAndLogoutSteps();
     FilterClaimsSteps filterClaimsSteps = new FilterClaimsSteps();
@@ -27,6 +30,7 @@ public class Claims {
 
     @Before
     public void setUp() {
+        SystemClock.sleep(8000);
         try {
             commonSteps.userLoggedIn();
         } catch (AssertionError e) {

@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -18,6 +18,7 @@ import static org.hamcrest.core.IsNot.not;
 import androidx.core.widget.NestedScrollView;
 import static ru.iteco.fmhandroid.ui.data.EspressoHelper.childAtPosition;
 import static ru.iteco.fmhandroid.ui.data.EspressoHelper.elementWaiting;
+import static ru.iteco.fmhandroid.ui.data.EspressoHelper.nestedScrollTo;
 
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.action.ViewActions;
@@ -25,6 +26,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
 
 import ru.iteco.fmhandroid.R;
+import ru.iteco.fmhandroid.ui.data.EspressoHelper;
 
 public class EditClaimsSteps {
 
@@ -36,6 +38,7 @@ public class EditClaimsSteps {
 
     public void editCommentClaims() {
         String comment = "редактирование комментария";
+        elementWaiting(withId(R.id.edit_comment_image_button), 8000);
         ViewInteraction appCompatImageButton = onView(allOf(withId(R.id.edit_comment_image_button), childAtPosition(
                 childAtPosition(withId(R.id.claim_comments_list_recycler_view), 0), 1)));
         appCompatImageButton.perform(click());
@@ -56,13 +59,13 @@ public class EditClaimsSteps {
         ViewInteraction textInputEditText = onView(allOf(childAtPosition(childAtPosition(
                 withId(R.id.comment_text_input_layout), 0), 1)));
         textInputEditText.perform(replaceText(text), closeSoftKeyboard());
-        ViewInteraction materialButton = onView(allOf(withId(R.id.save_button)));
-        materialButton.perform(scrollTo(), click());
     }
+
 
     public void addComment() {
         String text = "new comment";
         clickAddCommentInputText(text);
+        clickSaveButton();
         elementWaiting(withId(R.id.claim_comments_list_recycler_view), 8000);
         onView(withId(R.id.claim_comments_list_recycler_view))
                 .check(matches(hasDescendant(allOf(
@@ -73,6 +76,7 @@ public class EditClaimsSteps {
     public void addCommentWithoutText() {
         String text = " ";
         clickAddCommentInputText(text);
+        clickSaveButton();
         onView(withText(R.string.toast_empty_field)).inRoot(new EspressoHelper.ToastMatcher())
                 .check(matches(withText("The field cannot be empty.")));
     }
@@ -81,8 +85,7 @@ public class EditClaimsSteps {
         String text = "не должен сохраниться";
         clickAddCommentInputText(text);
         elementWaiting(withId(R.id.cancel_button), 8000);
-        ViewInteraction materialButton = onView(allOf(withId(R.id.cancel_button)));
-        materialButton.perform(scrollTo(), click());
+        clickCancelButton();
         elementWaiting(withId(R.id.claim_comments_list_recycler_view), 8000);
         onView(allOf(
                 withId(R.id.claim_comments_list_recycler_view),
@@ -90,19 +93,20 @@ public class EditClaimsSteps {
                         withId(R.id.comment_description_text_view),
                         withText(text)
                 )))
-        )).check(matches(isDisplayed()));
+        ));
     }
 
     public void clickChangeStatusButton() {
         elementWaiting(withId(R.id.claim_comments_list_recycler_view), 8000);
         ViewInteraction appCompatImageButton = onView(allOf(withId(R.id.status_processing_image_button)));
+        appCompatImageButton.perform(nestedScrollTo());
         appCompatImageButton.perform(click());
     }
 
     public void clickEditClaimButton() {
         elementWaiting(withId(R.id.claim_comments_list_recycler_view), 8000);
-        onView(withId(R.id.claim_comments_list_recycler_view)).perform(swipeUp());
         ViewInteraction appCompatImageButton = onView(allOf(withId(R.id.edit_processing_image_button)));
+        appCompatImageButton.perform(nestedScrollTo());
         appCompatImageButton.perform(click());
     }
 
@@ -139,6 +143,7 @@ public class EditClaimsSteps {
     }
 
     public void changeTitle(String title) {
+        elementWaiting(withId(R.id.title_edit_text), 8000);
         ViewInteraction textInputEditText = onView(withId(R.id.title_edit_text));
         textInputEditText.perform(click());
         textInputEditText.perform(replaceText(title), closeSoftKeyboard());

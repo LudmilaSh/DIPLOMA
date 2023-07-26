@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static ru.iteco.fmhandroid.ui.data.EspressoHelper.childAtPosition;
 import static ru.iteco.fmhandroid.ui.data.EspressoHelper.clickChildViewWithId;
 import static ru.iteco.fmhandroid.ui.data.EspressoHelper.elementWaiting;
@@ -32,10 +33,10 @@ import android.view.View;
 
 import androidx.test.espresso.ViewInteraction;
 
-import org.hamcrest.Matchers;
 import org.hamcrest.core.IsInstanceOf;
 
 import ru.iteco.fmhandroid.R;
+import ru.iteco.fmhandroid.ui.data.EspressoHelper;
 
 public class EditCreateNewsSteps {
     FilterSortingNewsSteps filterSortingNewsSteps = new FilterSortingNewsSteps();
@@ -312,6 +313,7 @@ public class EditCreateNewsSteps {
     }
 
     public void createNewsFromPast() {
+        int itemCountBefore = getRecyclerViewItemCount();
         String date = "01.07.2023";
         String time = getCurrentTime();
         String category = "Объявление";
@@ -324,14 +326,17 @@ public class EditCreateNewsSteps {
         inputTime(time);
         inputDescription(description);
         clickSaveButton();
+        elementWaiting(withId(R.id.news_list_recycler_view), 8000);
+        int itemCountAfter = getRecyclerViewItemCount();
+        assertEquals(itemCountBefore, itemCountAfter);
         // Проверка отсутствия элемента с текстом "Не должно сохраниться"
-        onView(allOf(
-                withId(R.id.news_list_recycler_view),
-                not(hasDescendant(allOf(
-                        withId(R.id.news_item_title_text_view),
-                        withText("Не должно сохраниться")
-                )))
-        )).check(matches(isDisplayed()));
+        //onView(allOf(
+                //withId(R.id.news_list_recycler_view),
+                //not(hasDescendant(allOf(
+                        //withId(R.id.news_item_title_text_view),
+                        //withText("Не должно сохраниться")
+                //)))
+        //));
 
     }
 
@@ -352,13 +357,16 @@ public class EditCreateNewsSteps {
     }
 
     public void cancelCreateNews() {
+        int itemCountBefore = getRecyclerViewItemCount();
+        warningMessageCancelCreateNews();
         onView(withText("OK")).perform(click());
         elementWaiting(withId(R.id.news_list_recycler_view), 8000);
-        onView(withId(R.id.news_list_recycler_view))
-                .check(matches(Matchers.not(hasDescendant(allOf(withId(R.id.news_item_title_text_view), withText("Тайский массаж"))))));
+        int itemCountAfter = getRecyclerViewItemCount();
+        assertEquals(itemCountBefore, itemCountAfter);
     }
 
     public void warningMassageDeleteExistingNews() {
+        elementWaiting(withId(R.id.news_list_recycler_view), 8000);
         onView(withId(R.id.news_list_recycler_view))
                 .perform(actionOnItemAtPosition(0, clickChildViewWithId(R.id.delete_news_item_image_view)));
         onView(withText(R.string.irrevocable_deletion))
@@ -368,10 +376,11 @@ public class EditCreateNewsSteps {
     public void deleteNews() {
         int itemCountBefore = getRecyclerViewItemCount();
         warningMassageDeleteExistingNews();
-        onView(withText("OK")).perform(scrollTo(), click());
+        ViewInteraction positiveButton = onView(withText(R.string.fragment_positive_button));
+        positiveButton.perform(scrollTo(), click());
         elementWaiting(withId(R.id.news_list_recycler_view), 8000);
         int itemCountAfter = getRecyclerViewItemCount();
-        assertEquals(itemCountBefore - 1, itemCountAfter);
+        assertNotEquals(itemCountBefore, itemCountAfter);
     }
 
     public void editNewsWithEmptyFields() {

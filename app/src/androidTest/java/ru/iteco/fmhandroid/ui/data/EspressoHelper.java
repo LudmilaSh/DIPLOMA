@@ -1,28 +1,21 @@
 package ru.iteco.fmhandroid.ui.data;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static java.util.EnumSet.allOf;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.WindowManager;
-import android.widget.ImageView;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.core.widget.NestedScrollView;
@@ -33,7 +26,6 @@ import androidx.test.espresso.Root;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.espresso.util.HumanReadables;
@@ -49,7 +41,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.qameta.allure.kotlin.Allure;
 import ru.iteco.fmhandroid.R;
 
 public class EspressoHelper {
@@ -325,7 +316,100 @@ public class EspressoHelper {
         };
     }
 
+    public class ScrollToViewAction implements ViewAction {
+        private final Matcher<View> viewMatcher;
 
+        public ScrollToViewAction(Matcher<View> viewMatcher) {
+            this.viewMatcher = viewMatcher;
+        }
+
+        @Override
+        public Matcher<View> getConstraints() {
+            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
+        }
+
+        @Override
+        public String getDescription() {
+            return "scroll RecyclerView to specific view";
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                int viewType = adapter.getItemViewType(i);
+                RecyclerView.ViewHolder holder = adapter.createViewHolder(recyclerView, viewType);
+                adapter.bindViewHolder(holder, i);
+                if (viewMatcher.matches(holder.itemView)) {
+                    recyclerView.scrollToPosition(i);
+                    return;
+                }
+            }
+        }
+    }
+
+    private static View findFirstParentLayoutOfClass(View view) {
+        ViewParent parent = new FrameLayout(view.getContext());
+        ViewParent incrementView = null;
+        int i = 0;
+        while (parent != null && !(parent.getClass() == NestedScrollView.class)) {
+            if (i == 0) {
+                parent = findParent(view);
+            } else {
+                parent = findParent(incrementView);
+            }
+            incrementView = parent;
+            i++;
+        }
+        return (View) parent;
+    }
+
+    private static ViewParent findParent(View view) {
+        return view.getParent();
+    }
+
+    private static ViewParent findParent(ViewParent view) {
+        return view.getParent();
+    }
+
+    public static ViewAction nestedScrollTo() {
+        return new ViewAction() {
+
+            @Override
+            public Matcher<View> getConstraints() {
+                return allOf(
+                        isDescendantOfA(isAssignableFrom(NestedScrollView.class)),
+                        withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE));
+            }
+
+            @Override
+            public String getDescription() {
+                return "View is not NestedScrollView";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                try {
+                    NestedScrollView nestedScrollView = (NestedScrollView)
+                            findFirstParentLayoutOfClass(view);
+                    if (nestedScrollView != null) {
+                        nestedScrollView.scrollTo(0, view.getTop());
+                    } else {
+                        throw new Exception("Unable to find NestedScrollView parent.");
+                    }
+                } catch (Exception e) {
+                    throw new PerformException.Builder()
+                            .withActionDescription(this.getDescription())
+                            .withViewDescription(HumanReadables.describe(view))
+                            .withCause(e)
+                            .build();
+                }
+                uiController.loopMainThreadUntilIdle();
+            }
+
+        };
+    }
 
 
 

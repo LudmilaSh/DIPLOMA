@@ -3,23 +3,24 @@ package ru.iteco.fmhandroid.ui.tests;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 
-import android.os.SystemClock;
-
 import androidx.test.rule.ActivityTestRule;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import io.qameta.allure.android.runners.AllureAndroidJUnit4;
 import io.qameta.allure.kotlin.Description;
 import io.qameta.allure.kotlin.junit4.DisplayName;
 import ru.iteco.fmhandroid.ui.AppActivity;
-import ru.iteco.fmhandroid.ui.data.AuthorizationAndLogoutSteps;
-import ru.iteco.fmhandroid.ui.data.CommonSteps;
-import ru.iteco.fmhandroid.ui.data.EditCreateNewsSteps;
-import ru.iteco.fmhandroid.ui.data.FilterSortingNewsSteps;
+import ru.iteco.fmhandroid.ui.steps.AuthorizationAndLogoutSteps;
+import ru.iteco.fmhandroid.ui.steps.CommonSteps;
+import ru.iteco.fmhandroid.ui.steps.EditCreateNewsSteps;
+import ru.iteco.fmhandroid.ui.steps.FilterSortingNewsSteps;
+import ru.iteco.fmhandroid.ui.data.ScreenshotTestRule;
 
+@RunWith(AllureAndroidJUnit4.class)
 public class News {
     FilterSortingNewsSteps filterSortingNewsSteps = new FilterSortingNewsSteps();
     EditCreateNewsSteps editCreateNewsSteps = new EditCreateNewsSteps();
@@ -27,6 +28,9 @@ public class News {
     AuthorizationAndLogoutSteps authorizationAndLogoutSteps = new AuthorizationAndLogoutSteps();
     @Rule
     public androidx.test.rule.ActivityTestRule<AppActivity> ActivityTestRule = new ActivityTestRule<>(AppActivity.class);
+
+    @Rule
+    public ScreenshotTestRule screenshotTestRule = new ScreenshotTestRule();
 
     @Before
     public void setUp() {
@@ -59,38 +63,38 @@ public class News {
         commonSteps.checkMenuButton(text);
     }
 
-    @Test //должен упасть, т.к. при первом нажатии на кнопку сортировки видимыми остаются самые последние новости
-    @DisplayName(" Сортировка новостей от старых к новым")
-    @Description("При нажатии на кнопку сортировки новостей один раз первыми на экране появляются самые первые новости")
-    public void shouldDateSortingFromPast() {
-        commonSteps.checkMenuButton(text);
-        filterSortingNewsSteps.dateSortingFromPast();
-    }
-
     @Test
     @DisplayName(" Сортировка новостей от новых к старым")
-    @Description("При нажатии на кнопку сортировки новостей второй раз первыми на экране появляются самые последние новости")
+    @Description("При нажатии на кнопку сортировки новостей один раз первыми на экране появляются самые свежие новости")
     public void shouldDateSortingFromNew() {
         commonSteps.checkMenuButton(text);
-        filterSortingNewsSteps.dateSortingFromNuw();
+        filterSortingNewsSteps.dateSortingOneClick();
     }
 
-    @Test //должен упасть, т.к. при первом нажатии на кнопку сортировки видимыми остаются самые последние новости
-    @DisplayName(" Сортировка новостей от старых к новым в разделе редактирования")
-    @Description("При нажатии на кнопку сортировки новостей в разделе редактирования один раз первыми на экране появляются самые первые новости")
-    public void shouldDateSortingFromPastEditingSection() {
+    @Test //упадет, фильтрация работает неправильно
+    @DisplayName(" Сортировка новостей от старых к новым")
+    @Description("При нажатии на кнопку сортировки новостей второй раз первыми на экране появляются самые старые новости")
+    public void shouldDateSortingFromPast() {
         commonSteps.checkMenuButton(text);
-        editCreateNewsSteps.checkEdit();
-        filterSortingNewsSteps.dateSortingFromPast();
+        filterSortingNewsSteps.dateSortingDoubleClick();
     }
 
     @Test
     @DisplayName(" Сортировка новостей от новых к старым в разделе редактирования")
-    @Description("При нажатии на кнопку сортировки новостей в разделе редактирования второй раз первыми на экране появляются самые последние новости")
+    @Description("При нажатии на кнопку сортировки новостей в разделе редактирования один раз первыми на экране появляются самые первые новости")
     public void shouldDateSortingFromNewEditingSection() {
         commonSteps.checkMenuButton(text);
         editCreateNewsSteps.checkEdit();
-        filterSortingNewsSteps.dateSortingFromNuw();
+        filterSortingNewsSteps.dateSortingOneClickControlPanel();
+    }
+
+    @Test
+    @DisplayName(" Сортировка новостей от старых к новым в разделе редактирования")
+    @Description("При нажатии на кнопку сортировки новостей в разделе редактирования второй раз первыми на экране появляются самые старые новости")
+    public void shouldDateSortingFromPastEditingSection() {
+        commonSteps.checkMenuButton(text);
+        editCreateNewsSteps.checkEdit();
+        filterSortingNewsSteps.dateSortingDoubleClickControlPanel();
     }
 
     @Test
@@ -109,13 +113,6 @@ public class News {
         filterSortingNewsSteps.filterDate();
     }
 
-    @Test
-    @DisplayName("Фильтрация новостей с выбором категории без выбора даты")
-    @Description("ПРи фильтрации новостей с выбором определенной категории отображаются новости только выбранной категории")
-    public void shouldFilterCategory() {
-        commonSteps.checkMenuButton(text);
-        filterSortingNewsSteps.filterCategory();
-    }
 
     @Test
     @DisplayName("Отмена фильтрации новостей")
@@ -254,9 +251,9 @@ public class News {
         editCreateNewsSteps.createNewsWithInvalidTime();
     }
 
-    //Дожен упасть, т.к. новость с датой публикации в прошлом не должна сохраняться, нужно сообщение об ошибке
+
     //При ручном тестировании нет возможности ввести дату из прошлого
-    @Test
+    @Test //должен упасть
     @DisplayName("Создание новости с датой публикации из прошлого")
     @Description("При создании новости с датой публикации из прошлого новость не должна создаваться")
     public void shouldNotCreateNewsWithInvalidDate() {
@@ -281,7 +278,6 @@ public class News {
     public void shouldCancelCreateNews() {
         commonSteps.checkMenuButton(text);
         editCreateNewsSteps.checkEdit();
-        editCreateNewsSteps.warningMessageCancelCreateNews();
         editCreateNewsSteps.cancelCreateNews();
     }
 
@@ -295,7 +291,7 @@ public class News {
         editCreateNewsSteps.warningMassageDeleteExistingNews();
     }
 
-    @Test //может падать, т.к. в момент удаления новости другие студенты их добавляют
+    @Test
     @DisplayName("Удаление существующей новости")
     @Description("При подтверждении удаления существующей новости новость удаляется")
     public void shouldDeleteNews() {

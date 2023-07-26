@@ -1,4 +1,4 @@
-package ru.iteco.fmhandroid.ui.data;
+package ru.iteco.fmhandroid.ui.steps;
 
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -31,6 +31,8 @@ import static ru.iteco.fmhandroid.ui.data.EspressoHelper.waitForElement;
 import androidx.test.espresso.ViewInteraction;
 
 import ru.iteco.fmhandroid.R;
+import ru.iteco.fmhandroid.ui.data.EspressoHelper;
+import ru.iteco.fmhandroid.ui.data.LoadingIdlingResource;
 
 public class AuthorizationAndLogoutSteps {
 
