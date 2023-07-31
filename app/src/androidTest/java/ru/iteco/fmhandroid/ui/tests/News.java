@@ -71,7 +71,7 @@ public class News {
         filterSortingNewsSteps.dateSortingOneClick();
     }
 
-    @Test //упадет, фильтрация работает неправильно
+    @Test //упадет, сортировка работает неправильно
     @DisplayName(" Сортировка новостей от старых к новым")
     @Description("При нажатии на кнопку сортировки новостей второй раз первыми на экране появляются самые старые новости")
     public void shouldDateSortingFromPast() {
